@@ -36,8 +36,8 @@ func Callback(ctx *gin.Context) {
 	for _, evn := range events {
 		if evn.Type == linebot.EventTypeMessage {
 			if msg, ok := evn.Message.(*linebot.TextMessage); ok {
-				resp := client.Requset(msg.Text)
-				_, err := bot.ReplyMessage(evn.ReplyToken, linebot.NewTextMessage(resp)).Do()
+				// resp := client.Requset(msg.Text)
+				_, err := bot.ReplyMessage(evn.ReplyToken, linebot.NewTextMessage(msg.Text)).Do()
 				if err != nil {
 					log.Println(err)
 					ctx.Status(500)
