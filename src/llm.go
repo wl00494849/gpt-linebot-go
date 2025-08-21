@@ -1,17 +1,15 @@
 package src
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"log"
 	"net/http"
 	"os"
-	"strings"
 )
 
 type gpt struct {
-	API_URL string
+	PYTHON_GPT_URL string
 }
 
 type Response struct {
@@ -20,27 +18,40 @@ type Response struct {
 
 func NewGPT() *gpt {
 	return &gpt{
-		API_URL: os.Getenv("API_URL"),
+		PYTHON_GPT_URL: os.Getenv("PYTHON_GPT_URL"),
 	}
 }
 
 func (g *gpt) Requset(prompt string) string {
 	var r Response
-	data := fmt.Sprintf(`{"prompt":"%s"}`, prompt)
-	resp, err := http.Post(g.API_URL, "application/json", strings.NewReader(data))
+	data := struct {
+		Prompt string `json:"prompt"`
+	}{Prompt: prompt}
+
+	b, _ := json.Marshal(data)
+
+	req, err := http.NewRequest(
+		http.MethodPost,
+		g.PYTHON_GPT_URL+"/gpt",
+		bytes.NewReader(b),
+	)
 
 	if err != nil {
-		log.Println(err)
+		fmt.Println("PostReqerr:", err)
+		return ""
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		fmt.Println("Decode error:", err)
+		return ""
 	}
 
 	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
 
-	if err != nil {
-		log.Println(err)
-	}
-
-	json.Unmarshal(body, &r)
+	json.NewDecoder(resp.Body).Decode(&r)
 
 	return r.Response
 }

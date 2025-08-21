@@ -11,6 +11,10 @@ import (
 var bot *linebot.Client
 var client *gpt
 
+type linebot_req struct {
+	Prompt string `json:"prompt"`
+}
+
 func Bot_Init() {
 	b, err := linebot.New(
 		os.Getenv("LINE_CHANNEL_SECRET"),
@@ -36,8 +40,8 @@ func Callback(ctx *gin.Context) {
 	for _, evn := range events {
 		if evn.Type == linebot.EventTypeMessage {
 			if msg, ok := evn.Message.(*linebot.TextMessage); ok {
-				// resp := client.Requset(msg.Text)
-				_, err := bot.ReplyMessage(evn.ReplyToken, linebot.NewTextMessage(msg.Text)).Do()
+				resp := client.Requset(msg.Text)
+				_, err := bot.ReplyMessage(evn.ReplyToken, linebot.NewTextMessage(resp)).Do()
 				if err != nil {
 					log.Println(err)
 					ctx.Status(500)
@@ -46,4 +50,16 @@ func Callback(ctx *gin.Context) {
 		}
 	}
 	ctx.Status(200)
+}
+
+func Test(ctx *gin.Context) {
+	var data linebot_req
+	err := ctx.ShouldBindBodyWithJSON(&data)
+
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	resp := client.Requset(data.Prompt)
+	ctx.JSON(200, resp)
 }

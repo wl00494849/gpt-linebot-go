@@ -15,8 +15,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=UTC \
 
 RUN apt-get install git
 
-# RUN git clone https://github.com/wl00494849/gpt-linebot-go.git
-
 COPY . .
 
 RUN --mount=type=cache,target=/go/pkg/mod \
@@ -26,7 +24,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 
 RUN go build -o /out/app main.go
 
-#執行容器
+#exec image
 FROM debian:bookworm-slim
 WORKDIR /
 
