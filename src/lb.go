@@ -11,8 +11,9 @@ import (
 var bot *linebot.Client
 var client *gpt
 
-type linebot_req struct {
-	Prompt string `json:"prompt"`
+type Push_Message_Req struct {
+	Message string `json:"message"`
+	UserID  string `json:"userid"`
 }
 
 func Bot_Init() {
@@ -40,7 +41,7 @@ func Callback(ctx *gin.Context) {
 	for _, evn := range events {
 		if evn.Type == linebot.EventTypeMessage {
 			if msg, ok := evn.Message.(*linebot.TextMessage); ok {
-				resp := client.Requset(msg.Text)
+				resp := client.Requset(msg.Text, evn.Source.UserID)
 				_, err := bot.ReplyMessage(evn.ReplyToken, linebot.NewTextMessage(resp)).Do()
 				if err != nil {
 					log.Println(err)
@@ -52,14 +53,13 @@ func Callback(ctx *gin.Context) {
 	ctx.Status(200)
 }
 
-func Test(ctx *gin.Context) {
-	var data linebot_req
-	err := ctx.ShouldBindBodyWithJSON(&data)
+func Push_Message(ctx *gin.Context) {
+	var data Push_Message_Req
 
-	if err != nil {
-		log.Panicln(err)
+	if err := ctx.ShouldBindJSON(&data); err != nil {
+		log.Println(err)
+		ctx.Status(500)
 	}
-
-	resp := client.Requset(data.Prompt)
-	ctx.JSON(200, resp)
+	bot.PushMessage(data.UserID, linebot.NewTextMessage(data.Message)).Do()
+	ctx.Status(200)
 }

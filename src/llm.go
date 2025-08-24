@@ -22,11 +22,12 @@ func NewGPT() *gpt {
 	}
 }
 
-func (g *gpt) Requset(prompt string) string {
+func (g *gpt) Requset(prompt string, userID string) string {
 	var r Response
 	data := struct {
 		Prompt string `json:"prompt"`
-	}{Prompt: prompt}
+		UserID string `json:"userID"`
+	}{Prompt: prompt, UserID: userID}
 
 	b, _ := json.Marshal(data)
 

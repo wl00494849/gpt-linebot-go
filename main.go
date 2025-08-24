@@ -19,6 +19,6 @@ func main() {
 
 	app := gin.Default()
 	app.POST("/bot_callback", src.Callback)
-	app.POST("/gpt_test", src.Test)
+	// app.POST("/push_message", src.Push_Message)
 	app.Run(port)
 }
