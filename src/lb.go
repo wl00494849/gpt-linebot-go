@@ -13,7 +13,7 @@ var client *gpt
 
 type Push_Message_Req struct {
 	Message string `json:"message"`
-	UserID  string `json:"userid"`
+	UserID  string `json:"userID"`
 }
 
 func Bot_Init() {
@@ -60,6 +60,7 @@ func Push_Message(ctx *gin.Context) {
 		log.Println(err)
 		ctx.Status(500)
 	}
+
 	bot.PushMessage(data.UserID, linebot.NewTextMessage(data.Message)).Do()
 	ctx.Status(200)
 }
