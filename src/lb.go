@@ -1,6 +1,7 @@
 package src
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -41,6 +42,7 @@ func Callback(ctx *gin.Context) {
 	for _, evn := range events {
 		if evn.Type == linebot.EventTypeMessage {
 			if msg, ok := evn.Message.(*linebot.TextMessage); ok {
+				fmt.Println(evn.Source.UserID)
 				resp := client.Requset(msg.Text, evn.Source.UserID)
 				_, err := bot.ReplyMessage(evn.ReplyToken, linebot.NewTextMessage(resp)).Do()
 				if err != nil {
@@ -54,6 +56,7 @@ func Callback(ctx *gin.Context) {
 }
 
 func Push_Message(ctx *gin.Context) {
+
 	var data Push_Message_Req
 
 	if err := ctx.ShouldBindJSON(&data); err != nil {
