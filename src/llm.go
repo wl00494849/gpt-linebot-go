@@ -33,7 +33,7 @@ func (g *gpt) Requset(message string, userID string) string {
 
 	req, err := http.NewRequest(
 		http.MethodPost,
-		g.PYTHON_GPT_URL+"/gpt",
+		g.PYTHON_GPT_URL+"/gpt/",
 		bytes.NewReader(b),
 	)
 
