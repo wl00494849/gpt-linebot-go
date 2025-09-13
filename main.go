@@ -20,6 +20,9 @@ func main() {
 	app := gin.Default()
 	app.POST("/bot_callback", lint_bot.Callback)
 	app.POST("/push_message", lint_bot.Push_Message)
+	app.GET("/live", func(ctx *gin.Context) {
+		ctx.Status(200)
+	})
 
 	app.Run(port)
 }
