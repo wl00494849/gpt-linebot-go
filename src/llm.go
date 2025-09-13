@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 )
 
 type gpt struct {
@@ -16,9 +15,9 @@ type Response struct {
 	Response string `json:"response"`
 }
 
-func NewGPT() *gpt {
+func NewGPT(gpt_url string) *gpt {
 	return &gpt{
-		PYTHON_GPT_URL: os.Getenv("PYTHON_GPT_URL"),
+		PYTHON_GPT_URL: gpt_url,
 	}
 }
 

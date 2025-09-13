@@ -3,36 +3,41 @@ package src
 import (
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/line/line-bot-sdk-go/v8/linebot"
 )
-
-var bot *linebot.Client
-var client *gpt
 
 type Push_Message_Req struct {
 	Message string `json:"message"`
 	UserID  string `json:"userID"`
 }
 
-func Bot_Init() {
-	b, err := linebot.New(
-		os.Getenv("LINE_CHANNEL_SECRET"),
-		os.Getenv("LINE_CHANNEL_TOKEN"),
+type Lint_Bot struct {
+	bot *linebot.Client
+	gpt *gpt
+}
+
+func NewLine_Bot(line_token string, line_secret string, gpt_url string) *Lint_Bot {
+	bot, err := linebot.New(
+		line_secret,
+		line_token,
 	)
+
+	gpt := NewGPT(gpt_url)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	client = NewGPT()
-	bot = b
+	return &Lint_Bot{
+		bot: bot,
+		gpt: gpt,
+	}
 }
 
-func Callback(ctx *gin.Context) {
-	events, err := bot.ParseRequest(ctx.Request)
+func (line_bot *Lint_Bot) Callback(ctx *gin.Context) {
+	events, err := line_bot.bot.ParseRequest(ctx.Request)
 
 	if err == linebot.ErrInvalidSignature {
 		log.Println(err)
@@ -43,8 +48,8 @@ func Callback(ctx *gin.Context) {
 		if evn.Type == linebot.EventTypeMessage {
 			if msg, ok := evn.Message.(*linebot.TextMessage); ok {
 				fmt.Println(evn.Source.UserID)
-				resp := client.Requset(msg.Text, evn.Source.UserID)
-				_, err := bot.ReplyMessage(evn.ReplyToken, linebot.NewTextMessage(resp)).Do()
+				resp := line_bot.gpt.Requset(msg.Text, evn.Source.UserID)
+				_, err := line_bot.bot.ReplyMessage(evn.ReplyToken, linebot.NewTextMessage(resp)).Do()
 				if err != nil {
 					log.Println(err)
 					ctx.Status(500)
@@ -55,7 +60,7 @@ func Callback(ctx *gin.Context) {
 	ctx.Status(200)
 }
 
-func Push_Message(ctx *gin.Context) {
+func (line_bot *Lint_Bot) Push_Message(ctx *gin.Context) {
 
 	var data Push_Message_Req
 
@@ -64,6 +69,6 @@ func Push_Message(ctx *gin.Context) {
 		ctx.Status(500)
 	}
 
-	bot.PushMessage(data.UserID, linebot.NewTextMessage(data.Message)).Do()
+	line_bot.bot.PushMessage(data.UserID, linebot.NewTextMessage(data.Message)).Do()
 	ctx.Status(200)
 }
