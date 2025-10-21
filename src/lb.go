@@ -42,6 +42,7 @@ func (line_bot *Lint_Bot) Callback(ctx *gin.Context) {
 	if err == linebot.ErrInvalidSignature {
 		log.Println(err)
 		ctx.Status(500)
+		return
 	}
 
 	for _, evn := range events {
@@ -53,6 +54,7 @@ func (line_bot *Lint_Bot) Callback(ctx *gin.Context) {
 				if err != nil {
 					log.Println(err)
 					ctx.Status(500)
+					return
 				}
 			}
 		}
@@ -67,6 +69,7 @@ func (line_bot *Lint_Bot) Push_Message(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(&data); err != nil {
 		log.Println(err)
 		ctx.Status(500)
+		return
 	}
 
 	line_bot.bot.PushMessage(data.UserID, linebot.NewTextMessage(data.Message)).Do()
