@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 while getopts "h:u:" opt; do
     case $opt in
