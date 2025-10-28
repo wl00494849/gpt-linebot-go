@@ -15,7 +15,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=UTC \
 
 RUN apt-get install git
 
-# COPY . .
+COPY . .
 
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
