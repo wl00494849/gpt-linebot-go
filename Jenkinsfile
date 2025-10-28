@@ -7,20 +7,33 @@ pipeline{
     }
 
     stages{
-        stage("Build and Push"){
+        stage('Set Env'){
+            steps{
+                script{
+                    env.VERSION = "v1.${env.BUILD_NUMBER}"
+                    env.REGISTRY = sh(script: 'getent hosts host.docker.internal | awk \'{print $1}\' || true', returnStdout: true).trim()
+                }
+            }
+        }
+        stage("Build Image"){
             steps{
                 echo 'building....'
                 script{
-                def version = "v1.${env.BUILD_NUMBER}"
-                def registry = sh(script: 'getent hosts host.docker.internal | awk \'{print $1}\' || true', returnStdout: true).trim()
                 sh """
-                    docker buildx build --platform linux/arm64 -t ${registry}:5000/${IMAGE_NAME}:${version} --load .
-                    docker push ${registry}:5000/${IMAGE_NAME}:${version}
+                    docker buildx build --platform linux/arm64 -t ${env.REGISTRY}:5000/${IMAGE_NAME}:${env.VERSION} --load .
                 """
+                }
             }
+        }
+        stage('Push Image'){
+            steps{
+                echo 'pushing'
+                script{
+                    sh"""
+                    docker push ${env.REGISTRY}:5000/${IMAGE_NAME}:${env.VERSION}
+                    """
+                }
             }
-            
-            
         }
     }
 }
