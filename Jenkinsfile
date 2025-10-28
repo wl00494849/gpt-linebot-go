@@ -8,7 +8,9 @@ pipeline{
 
     stages{
         stage("Build and Push"){
-            script{
+            steps{
+                echo 'building....'
+                script{
                 def version = "v1.${env.BUILD_NUMBER}"
                 def registry = sh(script: 'getent hosts host.docker.internal | awk \'{print $1}\' || true', returnStdout: true).trim()
                 sh """
@@ -16,6 +18,8 @@ pipeline{
                     docker push ${registry}:5000/${IMAGE_NAME}:${version}
                 """
             }
+            }
+            
             
         }
     }
