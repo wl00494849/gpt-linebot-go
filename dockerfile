@@ -13,8 +13,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=UTC \
     ca-certificates tzdata \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install git
-
 COPY . .
 
 RUN --mount=type=cache,target=/go/pkg/mod \
