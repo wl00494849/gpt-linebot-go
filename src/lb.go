@@ -8,17 +8,17 @@ import (
 	"github.com/line/line-bot-sdk-go/v8/linebot"
 )
 
-type Push_Message_Req struct {
+type PushMessageReq struct {
 	Message string `json:"message"`
 	UserID  string `json:"userID"`
 }
 
-type Lint_Bot struct {
+type LintBot struct {
 	bot *linebot.Client
 	gpt *gpt
 }
 
-func NewLine_Bot(line_token string, line_secret string, gpt_url string) *Lint_Bot {
+func NewLineBot(line_token string, line_secret string, gpt_url string) *LintBot {
 	bot, err := linebot.New(
 		line_secret,
 		line_token,
@@ -30,13 +30,13 @@ func NewLine_Bot(line_token string, line_secret string, gpt_url string) *Lint_Bo
 		log.Fatal(err)
 	}
 
-	return &Lint_Bot{
+	return &LintBot{
 		bot: bot,
 		gpt: gpt,
 	}
 }
 
-func (line_bot *Lint_Bot) Callback(ctx *gin.Context) {
+func (line_bot *LintBot) Callback(ctx *gin.Context) {
 	events, err := line_bot.bot.ParseRequest(ctx.Request)
 
 	if err == linebot.ErrInvalidSignature {
@@ -62,9 +62,9 @@ func (line_bot *Lint_Bot) Callback(ctx *gin.Context) {
 	ctx.Status(200)
 }
 
-func (line_bot *Lint_Bot) Push_Message(ctx *gin.Context) {
+func (line_bot *LintBot) Push_Message(ctx *gin.Context) {
 
-	var data Push_Message_Req
+	var data PushMessageReq
 
 	if err := ctx.ShouldBindJSON(&data); err != nil {
 		log.Println(err)

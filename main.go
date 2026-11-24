@@ -23,7 +23,7 @@ func init() {
 }
 
 func main() {
-	lint_bot := src.NewLine_Bot(line_token, line_secret, python_gpt_url)
+	lint_bot := src.NewLineBot(line_token, line_secret, python_gpt_url)
 
 	app := gin.Default()
 
